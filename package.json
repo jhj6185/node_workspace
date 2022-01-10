@@ -1,0 +1,22 @@
+{
+  "name": "bit-node",
+  "version": "1.0.0",
+  "description": "bitbit",
+  "main": "test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jhj6185/node_workspace.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jhj6185/node_workspace/issues"
+  },
+  "homepage": "https://github.com/jhj6185/node_workspace#readme",
+  "dependencies": {
+    "nconf": "^0.11.3"
+  }
+}

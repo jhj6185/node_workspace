@@ -41,6 +41,7 @@ function connectDB(){
                 userPwd: { type : String, required: true },
                 userName: { type : String, index: 'hashed' },
                 age: {type:Number, 'default' : -1},
+                // age: {type:Number},
                 regDate : { type: Date, index : { unique : false }, 'default': Date.now},
                 updateDate : { type: Date, index: { unique : false }, 'default': Date.now}
             });
@@ -78,10 +79,11 @@ app.use('/public',static(path.join(__dirname,'public')));//public 폴더를 /pub
 
 //===========================회원가입 기능 만들기===============================
 //회원가입을 위한 함수
-var addMember = function(database, userId, userPwd,userName, callback){
-    console.log('addMember 호출 : '+userId+","+userPwd+","+userName);
+var addMember = function(database, userId, userPwd,userName,age, callback){
+    console.log('addMember 호출 : '+userId+","+userPwd+","+userName+","+age);
     //MemberModel 인슨턴스 생성
-    var user= new MemberModel({"userId": userId, "userPwd": userPwd, "userName": userName});
+    var user= new MemberModel({"userId": userId, "userPwd": userPwd, "userName": userName, 
+    "age": age});
     // save()로 저장 : 저장 성공시 addedUser 객체가 파라미터로 전달됨
     user.save(function(err, addedUser){
         console.log("addedUser%j",addedUser);
@@ -184,11 +186,12 @@ router.route('/process/addMember').post(function(req,res){
      var userId = req.body.userId || req.query.userId;
      var userPwd = req.body.userPwd || req.query.userPwd;
     var userName= req.body.userName || req.query.userName;
+    var age = req.body.age || req.query.age;
 
-     console.log('요청 파라미터 : '+userId+','+userPwd+','+userName);
+     console.log('요청 파라미터 : '+userId+','+userPwd+','+userName+','+age);
      //데이터베이스 객체가 초기화된 경우, authMember 함수 호출하여 사용자 인증
      if(database){
-         addMember(database,userId,userPwd,userName, function(err, addedUser){ //result는 
+         addMember(database,userId,userPwd,userName,age, function(err, addedUser){ //result는 
             //addMember에 올라가면 result를 callback(null, result);로 해주고있어서
             // 그 result가 여기의 result인데 어떤 데이터를 insert하게되면,
             //result객체에 몇개의 데이터가 삽입됐는지 뜨고, 어떤 데이터가 삽입되었는지 
@@ -272,8 +275,14 @@ router.route('/process/addMember').post(function(req,res){
                   res.write('<div><ul>');
                   for(var i=0; i<results.length; i++){
                       var curUserId = results[i]._doc.userId;
+                      var curUserPwd = results[i]._doc.userPwd;
                       var curUserName = results[i]._doc.userName;
-                      res.write('<li>#'+i+':'+curUserId+','+curUserName+'</li>');
+                      var curUserAge = results[i]._doc.age;
+                      var curRegDate = results[i]._doc.regDate;
+                      var curUpdateDate = results[i]._doc.updateDate;
+                      res.write('<li>#'+i+' : '+curUserId+', '+curUserPwd+', '+
+                      curUserName+', '+curUserAge+', '+curRegDate+', '+curUpdateDate+', '+
+                      '</li>');
                   }
                   res.write('</ul></div>');
                   res.end();

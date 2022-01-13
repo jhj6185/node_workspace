@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        .sky{
+            background-color: skyblue;
+        }
+        .size{
+            width: 600px;
+            border: 1px solid skyblue;
+        }
+        th,td{
+            border: 1px solid skyblue;
+        }
+    </style>
+</head>
+<body>
+    <h1>광역시 대기오염 실시간 평균 정보</h1>
+    측정 항목: CO/시간평균(일주일)
+    <table class="size">
+        <tr>
+        <th class="sky">대구</th>
+        <th class="sky">인천</th>
+        <th class="sky">광주</th>
+        <th class="sky">울산</th>
+        <th class="sky">서울</th>
+        <th class="sky">부산</th>
+    </tr>
+    <tbody id="tblShow"></tbody>
+        
+    </table>
+</body>
+<script>
+    $(document).ready(function(){
+        $.ajax({
+            url: 'http://apis.data.go.kr/B552584/ArpltnStatsSvc/getCtprvnMesureLIst?itemCode=CO&dataGubun=HOUR&pageNo=1&numOfRows=10&returnType=xml&serviceKey=7%2BKYOJKSHPexw8fbYANJcLaGezTYYbiL3H%2FstWK6%2F3KRHxTakSqUxKubRjZG0Oil0zaM1M7z4WARy6ZmSrCSVw%3D%3D',
+            success: function(data){
+                $(data).find('item').each(function(){
+                    var daegu = $(this).find('daegu').text();
+                    var incheon=$(this).find('incheon').text();
+                    var gwangju=$(this).find('gwangju').text();
+                    var ulsan=$(this).find('ulsan').text();
+                    var seoul=$(this).find('seoul').text();
+                    var busan=$(this).find('busan').text();
+                    
+                    $('#tblShow').append('<tr><td>'+daegu+'</td><td>'+incheon+'</td><td>'+gwangju+'</td><td>'+ulsan+'</td><td>'+seoul+
+                        '</td><td>'+busan+'</td></tr>');
+                })
+            }
+        })
+    })
+</script>
+</html>

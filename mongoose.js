@@ -106,9 +106,11 @@ var authMember = function(database, userId, userPwd, callback){
         console.log('아이디 [%s]로 사용자 검색결과',userId);
         if(results.length>0){
             console.log('아이디와 일치하는 사용자 찾음.');
+            callback(null,null);
+            // 2. 비밀번호 확인
             if (results[0]._doc.userPwd== userPwd){
                 console.log('비밀번호 일치함');
-                callback(null,null);
+                callback(null,results);
             }
         }else{
             console.log("아이디와 일치하는 사용자를 찾지 못함");
@@ -116,6 +118,9 @@ var authMember = function(database, userId, userPwd, callback){
         }
     });
 }
+//=============================회원 리스트 조회 기능==========================
+
+
 //================================회원정보 수정 기능=========================
 var updateMember = function(database, userId, userPwd, callback){
     console.log('updateMember 호출 : '+userId+","+userPwd);
@@ -171,7 +176,7 @@ router.route('/process/login').post(function(req,res){
    }
     
 });
-//회원가입기능
+//---------------------------------회원가입기능--------------------------------
 router.route('/process/addMember').post(function(req,res){
     
     console.log('/process/addMember 호출됨');
@@ -212,7 +217,7 @@ router.route('/process/addMember').post(function(req,res){
      }
       
   });
-  //회원정보 수정 기능
+  //-------------------------------회원정보 수정 기능------------------------------
   router.route('/process/updateMember').post(function(req,res){
 
     console.log('/process/updateMember 호출됨');
@@ -245,6 +250,40 @@ router.route('/process/addMember').post(function(req,res){
      }
       
   });
+  //---------------------------------회원 리스트 조회 기능 -----------------------
+  router.route('/process/listMember').post(function(req,res){
+      console.log('/process/listMember 호출됨');
+      if(database){
+          // 1. 모든 사용자 검색
+          MemberModel.findAll(function(err,results){
+              if(err){
+                  console.error('사용자 리스트 조회 중 오류 발생 : '+err.stack);
+                  res.writeHead('200', {'Content-Type': 'text/html;charset=utf8'});
+                  res.write('<h2>사용자 리스트 조회 중 오류 발생</h2>');
+                  res.write('<p>'+err.stack+'</p>');
+                  res.end();
+                  return;
+              }
+              if(results){
+                  //결과 객체 있으면 리스트 전송 
+                  console.dir(results);
+                  res.writeHead('200',{'Content-Type': 'text/html;charset=utf8'});
+                  res.write('<h2>사용자 리스트</h2>');
+                  res.write('<div><ul>');
+                  for(var i=0; i<results.length; i++){
+                      var curUserId = results[i]._doc.userId;
+                      var curUserName = results[i]._doc.userName;
+                      res.write('<li>#'+i+':'+curUserId+','+curUserName+'</li>');
+                  }
+                  res.write('</ul></div>');
+                  res.end();
+              }else{
+                  //결과 객체 없으면 실패 응답 전송
+              }
+          }); //findAll end
+      }
+  })
+
 //============================================================================
 app.use('/', router) //라우터 객체를 app객체에 등록
 

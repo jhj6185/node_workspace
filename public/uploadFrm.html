@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- multer 미들웨어를 이용한 파일 업로드
+        파일 업로드시 post방식으로 요청해야 하며, body-parser, fs, cors 모듈 사용
+        프로젝트 내부에 uploads 폴더 생성 -->
+    <form method="POST" enctype="multipart/form-data" action="/process/upload">
+        <table>
+            <tr>
+                <td><lable>파일</lable></td>
+                <td><input type="file" name="uploadedFile"/></td>
+            </tr>
+        </table>
+        <input type="submit" value="업로드" name="submit"/>
+    </form>
+</body>
+</html>

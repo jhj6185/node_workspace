@@ -37,10 +37,22 @@ function connectDB(){
             console.log('데이터베이스에 연결되었습니다. : '+databaseUrl);
             //스키마 정의
             MemberSchema = mongoose.Schema({
-                userId:String,
-                userPwd: String,
-                userName: String
+                userId:{ type : String, required: true, unique: true},
+                userPwd: { type : String, required: true },
+                userName: { type : String, index: 'hashed' },
+                age: {type:Number, 'default' : -1},
+                regDate : { type: Date, index : { unique : false }, 'default': Date.now},
+                updateDate : { type: Date, index: { unique : false }, 'default': Date.now}
             });
+
+            //스키마에 static 메소드 추가
+            MemberSchema.static('findById', function(userId, callback){
+                return this.find({ userId : userId }, callback);
+            });
+            MemberSchema.static('findAll', function(callback){
+                return this.find({}, callback);
+            });
+
             console.log('MemberSchema 정의함');
             //MemberModel 모델 정의
             MemberModel = mongoose.model("members2", MemberSchema); //members2라는 컬렉션이
@@ -82,21 +94,24 @@ var addMember = function(database, userId, userPwd,userName, callback){
     });
 }
 //==============================로그인 기능 추가======================
-//사용자를 인증하는 함수
+//사용자를 인증하는 함수 , findById()사용
 var authMember = function(database, userId, userPwd, callback){
-    console.log('authMember 호출됨');
-    MemberModel.find({"userId": userId, "userPwd" : userPwd}, function(err,results){
+    console.log('authMember 호출됨 : '+userId+','+userPwd);
+    // 1. 아이디를 사용해 검색
+    MemberModel.findById(userId, function(err,results){
         if(err){
             callback(err, null);
             return;
         }
-        console.log('아이디 [%s], 비밀번호 [%s]로 사용자 검색결과',userId, userPwd);
-        console.dir(results);
+        console.log('아이디 [%s]로 사용자 검색결과',userId);
         if(results.length>0){
-            console.log('일치하는 사용자 찾음.', userId, userPwd);
-            callback(null, results);
+            console.log('아이디와 일치하는 사용자 찾음.');
+            if (results[0]._doc.userPwd== userPwd){
+                console.log('비밀번호 일치함');
+                callback(null,null);
+            }
         }else{
-            console.log("일치하는 사용자를 찾지 못함");
+            console.log("아이디와 일치하는 사용자를 찾지 못함");
             callback(null,null);
         }
     });
@@ -130,7 +145,6 @@ router.route('/process/login').post(function(req,res){
     //요청 파라미터 확인
    var userId = req.body.userId || req.query.userId;
    var userPwd = req.body.userPwd || req.query.userPwd;
-   var userName = req.body.userName || req.query.userName;
    
    //데이터베이스 객체가 초기화된 경우, authMember 함수 호출하여 사용자 인증
    if(database){

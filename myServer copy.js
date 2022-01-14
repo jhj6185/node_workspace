@@ -104,7 +104,7 @@ router.route('/process/listMember').post(function(req,res){
                 //결과 객체 있으면 리스트 전송 
                 console.dir(results);
                 printListMember(results,res); //results와 res를 안보내주면 
-                //member_hj.js에서 results가 정의되어있지않다고 뜸
+                //member.js에서 results가 정의되어있지않다고 뜸
             }else{
                 //결과 객체 없으면 실패 응답 전송
                 res.writeHead('200', {'Content-Type':'text/html;charset=utf8'});

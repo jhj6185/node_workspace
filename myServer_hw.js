@@ -154,7 +154,7 @@ var router = express.Router();
 // })
 
 router.route('/process/addMember').post(function (req, res) {
-    var add = require('./member').addMember
+    var add = require('./member_hj').addMember
     add(database, req, res , addMember)
 })
 
@@ -190,7 +190,7 @@ router.route('/process/addMember').post(function (req, res) {
 // })
 
 router.route('/process/authMember').post(function (req, res) {
-    var auth = require('./member').authMember
+    var auth = require('./member_hj').authMember
     auth(database, req, res , authMember)
 })
 
@@ -230,7 +230,7 @@ router.route('/process/authMember').post(function (req, res) {
 //     }
 // })
 router.route('/process/listMember').post(function (req, res) {
-    var list = require('./member').listMember
+    var list = require('./member_hj').listMember
     list(database, MemberModel, res)
 })
 

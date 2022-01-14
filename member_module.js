@@ -50,21 +50,21 @@ var procAddMember = function (req, res) {
     //요청 파라미터 확인
     var userId = req.body.userId || req.query.userId;
     var userPwd = req.body.userPwd || req.query.userPwd;
-    // var userName = req.body.userName || req.query.userName;
-    // var age = req.body.age || req.query.age;
+    var userName = req.body.userName || req.query.userName;
+    var age = req.body.age || req.query.age;
     var database = req.app.get('database');
 
     console.log('요청 파라미터 : ' + userId + ',' + userPwd );
     //데이터베이스 객체가 초기화된 경우, authMember 함수 호출하여 사용자 인증
     if (database.db) {
        
-        addMember(database, userId, userPwd, function (err, addedUser) { //result는 
+        addMember(database, userId, userPwd,userName,age, function (err, addedUser) { //result는 
             //addMember에 올라가면 result를 callback(null, result);로 해주고있어서
             // 그 result가 여기의 result인데 어떤 데이터를 insert하게되면,
             //result객체에 몇개의 데이터가 삽입됐는지 뜨고, 어떤 데이터가 삽입되었는지 
             //result에 대한 정보가 쫙 들어있는데 그거가 있고, insertedCount가 0보다 큰지
             //이런거로 확인해주는 것...(근데 playground result에는 result의 아이디값만 뜸..)
-            var context = { userId: userId, userPwd: userPwd };
+            var context = { userId: userId, userPwd: userPwd, userName : userName, age: age };
                 req.app.render('addSuccess', context, function (err, html) {
             if (err) {
                 throw err;
@@ -75,8 +75,6 @@ var procAddMember = function (req, res) {
                 //이건 하나만 있어야함! 또 불러오면 오류남
                 
                 console.dir(addedUser);
-                // res.writeHead('200', { 'Content-Type': 'text/html;charset=utf8' });
-                // res.write('<h1>회원가입 성공</h1>');
                 res.end(html);// res.end(html)이 없으면 html을 담아서 rendering이 안되서
                 //페이지 이동이 안됨! 명심
             
@@ -204,12 +202,13 @@ var authMember = function (database, userId, userPwd, callback) {
 }
 
 //========================사용자를 추가하는 함수====================
-var addMember = function (database, userId, userPwd, callback) {
+var addMember = function (database, userId, userPwd,userName, age, callback) {
 
     console.log('addMember 호출 : ' + userId + "," + userPwd );
     //MemberModel 인슨턴스 생성
     var user = new database.MemberModel({
-        "userId": userId, "userPwd": userPwd
+        "userId": userId, "userPwd": userPwd,
+        "userName" : userName, "age" : age
     });
     // save()로 저장 : 저장 성공시 addedUser 객체가 파라미터로 전달됨
     user.save(function (err, addedUser) {

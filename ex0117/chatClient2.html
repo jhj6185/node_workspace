@@ -65,7 +65,7 @@
         socket.on('connect', function(){ //연결됐을때
             println('웹소켓 서버에 연결됨 : '+url);
             socket.on('message', function(message){ //message를 받으면
-                console.log(JSON.stringify(message));
+                console.log(JSON.stringify(message)); //javascript 값이나 객체를 json 문자열로 변환
                 println('<p>수신 메시지 : '+message.sender + ','+message.recepient+','+message.command+','+
                     message.data+'</p>');
             });

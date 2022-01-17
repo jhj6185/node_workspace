@@ -123,7 +123,8 @@ io.sockets.on('connection', function(socket){
             console.dir('나 포함 모든 클라이언트에게 message 이벤트를 전송');
             io.sockets.emit('message', message);
         }else{
-            if(login_userIds[message.recepient]){
+            //일대일 채팅
+            if(login_userIds[message.recepient]){ //받는사람 = recepient
                 io.sockets.to(login_userIds[message.recepient]).emit('message', message);
                 //message 이벤트를 받았을 때 일대일 채팅인 경우 상대방 소켓을 찾아 메시지 전송
                 sendResponse(socket, 'message', '200', '메시지를 전송완료'); //메시지

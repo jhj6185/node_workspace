@@ -74,7 +74,8 @@ app.use(bodyParser.json())
 //ex0117폴더를 static으로 오픈
 app.use('/ex0117',static(path.join(__dirname,'ex0117')));//ex0117 폴더를 /ex0117이라는 주소창의 경로로 무조건 받겠다
 //이런 뜻이랭..
-
+app.use('/semantic', static(path.join(__dirname,'semantic')));
+app.use('/images', static(path.join(__dirname,'images')));
 var router = express.Router();
 
 //===================================================================================================
@@ -102,14 +103,16 @@ io.sockets.on('connection', function(socket){
         login_userIds[login.userId] = socket.id; //socket.id는 고유 속성이므로 변경하지 말 것
         socket.login_userId=login.userId;
         console.log('접속한 클라이언트 id 개수 : %d', Object.keys(login_userIds).length);
-        sendResponse(socket, 'login', '200', '로그인되었음'); //응답 메시지 전송
+        sendResponse(socket, 'login', '200', '로그인되었음',login.time); //응답 메시지 전송
     });
     //응답 메시지 전송 메소드
-    function sendResponse(socket, command, code, message){
+    function sendResponse(socket, command, code, message,time){
         var statusObj = {
+            sender : 'self',
             command : command,
             code : code,
-            message : message
+            message : message,
+            time:time
         };
         socket.emit('response', statusObj);
     }
@@ -127,7 +130,7 @@ io.sockets.on('connection', function(socket){
             if(login_userIds[message.recepient]){ //받는사람 = recepient
                 io.sockets.to(login_userIds[message.recepient]).emit('message', message);
                 //message 이벤트를 받았을 때 일대일 채팅인 경우 상대방 소켓을 찾아 메시지 전송
-                sendResponse(socket, 'message', '200', '메시지를 전송완료'); //메시지
+                sendResponse(socket, 'message', '200', message.data,message.time); //메시지
             }else{
                 sendResponse(socket, 'login', '404', '상대방의 로그인 ID를 찾을 수 없음');
             }

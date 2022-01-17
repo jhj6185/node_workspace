@@ -6,38 +6,109 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link href="/semantic/semantic.min.css" rel="stylesheet" />
+	<script src="/semantic/semantic.min.js"></script>
+    <link href="12PM/style.css" rel="stylesheet" />
 </head>
 <body>
     <h3>채팅 클라이언트</h3>
     <br>
-    <div>
-        <input type="text" id="hostInput" value="localhost"/>
-        <input type="text" id="portInput" value="3000"/>
-        <input type="button" id="connectButton" value="연결하기"/>
-    </div><br>
+    <br>
     <!-- 일대일 채팅을 위한 영역 -->
-    <div>
-        <input type="text" id="userIdInput" value="test01">
-        <input type="password" id="userPwdInput" value="1234">
-        <input type="text" id="aliasInput" value="코난">
-        <input type="text" id="todayInput" value="쨍!">
-        <input type="button" id="loginButton" value="로그인">
-        <input type="button" id="logoutButton" value="로그아웃">
+    <div class="container">
+        <div id="cardbox" class="ui blue fluid card">
+            <div class="content">
+                <!-- 연결하기 -->
+                <div>
+                    <div class="ui input">
+                        <input type="text" id="hostInput" value="localhost"/>
+                    </div>
+                    <div class="ui input">
+                        <input type="text" id="portInput" value="3000"/>
+                    </div>
+                    <br><br>
+                    <input type="button" id="connectButton" value="연결하기"/>
+                </div>
+                <!-- 로그인/로그아웃 부분임 -->
+                <div>
+                    <div class="ui input">
+                        <input type="text" id="userIdInput" value="test01">
+                    </div>
+                    <div class="ui input">
+                        <input type="password" id="userPwdInput" value="1234">
+                    </div>
+                    <div class="ui input">
+                        <input type="text" id="aliasInput" value="코난">
+                    </div>
+                    <div class="ui input">
+                        <input type="text" id="todayInput" value="쨍!">
+                    </div>
+                    <br><br>
+                    <input class="ui primary button" type="button" id="loginButton" value="로그인"/>
+                    <input class="ui primary button" type="button" id="loginButton" value="로그아웃"/>
+                </div>
+
+                <!-- 전송하기 부분임 -->
+                <div>
+                    <div class="description">
+                        <span>보내는 사람 아이디 : </span>
+                        <div class="ui input"><input type="text" id="senderInput" value="test01"/></div>
+                    </div>
+                    <div class="description">
+                        <span>받는 사람 아이디 : </span>
+                        <div class="ui input"><input type="text" id="recepientInput" value="ALL"/></div>
+                    </div>
+                    <div class="description">
+                        <span>메시지 데이터 : </span>
+                        <div class="ui input"><input type="text" id="dataInput" value="안녕!"></div>
+                    </div>
+                    <br>
+                    <input class="ui primary button" type="button" id="sendButton" value="전송"/>
+                    <input class="ui primary button" type="button" id="clearButton" value="결과 지우기"/>
+                </div>
+
+                <!-- 결과 표시 -->
+                <h4 class="ui horizontal divider header">메시지</h4>
+                <div class="ui segment" id="result">
+                    <ol class="discussion">
+                        <li class="other">
+                            <div class="avatar">
+                                <img src="/images/conan.jpg"/>
+                            </div>
+                            <div class="messages">
+                                <p>내 이름은 코난, 탐정이죠</p>
+                                <time datetime="2016-02-10 18:10">18시 10분</time>
+                            </div>
+                        </li>
+                        <li class="self">
+                            <div class="avatar">
+                                <img src="/images/rose.jpg"/>
+                            </div>
+                            <div class="messages">
+                                <p>뭐래?</p>
+                                <time datetime="2016-02-10 18:00">18시 00분</time>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="left floated author">
+                    <img id="iconImage" class="ui avatar image" src="../images/conan.jpg">
+                </div>
+                <div>
+                    <div id="titleText" class="header">일대일 채팅</div>
+                    <div id="contentsText" class="description">
+                        연결 및 로그인 후 메시지를 보내세요
+                    </div>
+                </div>
+                <br>
+                <!-- content -->
+            </div>
+            <!-- cardbox -->
+        </div>
+        <!-- container -->
     </div>
 
-    <div>
-        <span>보내는 사람 아이디 : </span>
-        <input type="text" id="senderInput" value="test01">
-    </div>
-    <div>
-        <span>받는 사람 아이디 : </span>
-        <input type="text" id="recepientInput" value="ALL">
-    </div>
-    <div>
-        <span>메시지 데이터 : </span>
-        <input type="text" id="dataInput" value="안녕!">
-    </div><br>
-    <input type="button" id="sendButton" value="전송"/>
     <hr/>
     <p>결과 : </p>
     <div id="result"></div>
@@ -51,7 +122,7 @@
     $(function(){
         //문서 로딩 후 실행됨
         $("#connectButton").bind('click', function(event){
-            println('connectButton이 클릭됨');
+            //println('connectButton이 클릭됨');
             host = $('#hostInput').val(); //localhost
             port = $('#portInput').val(); //3000
             connectToServer();
@@ -63,16 +134,27 @@
         var url = 'http://'+host+':'+port;
         socket = io.connect(url,options);
         socket.on('connect', function(){ //연결됐을때
-            println('웹소켓 서버에 연결됨 : '+url);
+            //println('웹소켓 서버에 연결됨 : '+url);
             socket.on('message', function(message){ //message를 받으면
                 console.log(JSON.stringify(message)); //javascript 값이나 객체를 json 문자열로 변환
-                println('<p>수신 메시지 : '+message.sender + ','+message.recepient+','+message.command+','+
-                    message.data+'</p>');
+                //수신 메시지
+                // printOther(message.sender,message.recepient,message.command,message.data);
+                //println('<p>수신 메시지 : '+message.sender + ','+message.recepient+','+message.command+','+
+                //  message.data+'</p>');
+                    //웹 소켓 서버에 연결되었습니다
+                var msg=message.data;
+                var writer= message.sender;
+                var time = message.time;
+                addToDiscussion(writer, msg,time);
             });
             socket.on('response', function(response){
                 console.log(JSON.stringify(response));
-                println('<p>응답 메시지를 받았습니다 : '+response.command+','+response.code+
-                    response.message+'</p>');
+                //println('<p>응답 메시지를 받았습니다 : '+response.command+','+response.code+ response.message+'</p>');
+
+                var msg=response.message;
+                var writer= response.sender;
+                var time = response.time;
+                addToDiscussion(writer, msg,time);
             });
         });
         socket.on('disconnect',function(){ //종료됐을 때
@@ -90,12 +172,14 @@
         var recepient = $('#recepientInput').val();
         console.log(recepient + " : recepient 머임?")
         var data = $('#dataInput').val();
+        var time = Date();
         var output = { 
-            sender: sender,
+            sender: 'other',
             recepient : recepient,
             command : 'chat',
             type: 'text',
-            data : data
+            data : data,
+            time:time
         };
         console.log('서버로 보낼 데이터 : '+JSON.stringify(output));
         if(socket == undefined){
@@ -111,7 +195,8 @@
         var userPwd = $('#userPwdInput').val();
         var alias = $('#aliasInput').val();
         var today = $('#todayInput').val();
-        var output = {userId : userId, userPwd : userPwd, alias : alias, today : today};
+        var time = Date();
+        var output = {userId : userId, userPwd : userPwd, alias : alias, today : today,time:time};
         console.log('서버로 보낼 데이터 : '+JSON.stringify(output));
         if(socket == undefined){
             alert('서버에 연결 안됨, 먼저 서버에 연결부터');
@@ -119,6 +204,27 @@
         }
         socket.emit('login', output);
     })
+
+    function addToDiscussion(writer, msg, time){
+        //println("addToDiscussion 호출됨 : "+writer+","+msg);
+        var url = 'http://'+host+':'+port;
+        var img = '../images/conan.jpg';
+        if (writer == 'other'){
+            img = '../images/rose.jpg';
+        }
+        var contents = "<li class='"+writer+"'>"+
+            "<div class='avatar'>"+
+            "<img src='"+img+"'/>"+
+            "</div>"+
+            "<div class='messages'>"+
+            "<p>"+msg+"</p>"+
+            "<time datetime='"+time+"'>"+time+"</time>"+
+            "</div>"+
+            "</li>";
+            //println("추가할 HTML : "+contents);
+            $(".discussion").prepend(contents); //prepend : 앞에 추가되는것
+
+    }
 </script>
 </html>
 <!-- 모든 사람한테 보내는것 : emit, 받는것 on -->

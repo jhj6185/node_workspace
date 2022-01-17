@@ -52,22 +52,27 @@
         //문서 로딩 후 실행됨
         $("#connectButton").bind('click', function(event){
             println('connectButton이 클릭됨');
-            host = $('#hostInput').val();
-            port = $('#portInput').val();
+            host = $('#hostInput').val(); //localhost
+            port = $('#portInput').val(); //3000
             connectToServer();
         });
     });
     function connectToServer(){
         //서버에 연결하는 함수 정의
-        var options= {'forceNew': true};
+        var options= {'forceNew': true}; // 기존의 연결을 재사용 할 수 있도록
         var url = 'http://'+host+':'+port;
         socket = io.connect(url,options);
         socket.on('connect', function(){ //연결됐을때
             println('웹소켓 서버에 연결됨 : '+url);
-            socket.on('message', function(message){
+            socket.on('message', function(message){ //message를 받으면
                 console.log(JSON.stringify(message));
                 println('<p>수신 메시지 : '+message.sender + ','+message.recepient+','+message.command+','+
                     message.data+'</p>');
+            });
+            socket.on('response', function(response){
+                console.log(JSON.stringify(response));
+                println('<p>응답 메시지를 받았습니다 : '+response.command+','+response.code+
+                    response.message+'</p>');
             });
         });
         socket.on('disconnect',function(){ //종료됐을 때

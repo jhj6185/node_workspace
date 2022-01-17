@@ -126,7 +126,7 @@ io.sockets.on('connection', function(socket){
             if(login_userIds[message.recepient]){
                 io.sockets.to(login_userIds[message.recepient]).emit('message', message);
                 //message 이벤트를 받았을 때 일대일 채팅인 경우 상대방 소켓을 찾아 메시지 전송
-                sendResponse(socket, 'message', '200', '메시지를 전송완료');
+                sendResponse(socket, 'message', '200', '메시지를 전송완료'); //메시지
             }else{
                 sendResponse(socket, 'login', '404', '상대방의 로그인 ID를 찾을 수 없음');
             }

@@ -91,24 +91,48 @@ var server = app.listen(app.get('port'), function(){
 var io=socketio(server);
 console.log('socket.io 요청 대기중');
 
-//클라이언트가 연결했을 때의 이벤트 처리
+var login_userIds = {};
 io.sockets.on('connection', function(socket){
-    console.log('connection info : ',socket.request.connection._peername);
-    //소켓 객체에 클라이언트 Host, Port 정보 속성으로 추가
-    socket.remoteAddress = socket.request.connection._peername.address; //ip
-    socket.remotePort = socket.request.connection._peername.port; //port번호
+    //client가 연결했을 때의 이벤트 처리
+    socket.on('login', function(login){
+        //'login'이벤트를 받았을 때의 처리
+        console.log('login 이벤트 발생');
+        console.dir(login);
+        //기존 클라이언트 id가 없으면 client id를 맵에 추가
+        login_userIds[login.userId] = socket.id; //socket.id는 고유 속성이므로 변경하지 말 것
+        socket.login_userId=login.userId;
+        console.log('접속한 클라이언트 id 개수 : %d', Object.keys(login_userIds).length);
+        sendResponse(socket, 'login', '200', '로그인되었음'); //응답 메시지 전송
+    });
+    //응답 메시지 전송 메소드
+    function sendResponse(socket, command, code, message){
+        var statusObj = {
+            command : command,
+            code : code,
+            message : message
+        };
+        socket.emit('response', statusObj);
+    }
 
-    // 'message'이벤트를 받았을 때의 처리
-    socket.on('message', function(message){
+     // 'message'이벤트를 받았을 때의 처리
+     socket.on('message', function(message){
         console.log('message 이벤트를 받았음');
         console.dir(message);
         if(message.recepient == 'ALL'){
             //나를 포함한 모든 클라이언트에게 메시지 전달
             console.dir('나 포함 모든 클라이언트에게 message 이벤트를 전송');
             io.sockets.emit('message', message);
+        }else{
+            if(login_userIds[message.recepient]){
+                io.sockets.to(login_userIds[message.recepient]).emit('message', message);
+                //message 이벤트를 받았을 때 일대일 채팅인 경우 상대방 소켓을 찾아 메시지 전송
+                sendResponse(socket, 'message', '200', '메시지를 전송완료');
+            }else{
+                sendResponse(socket, 'login', '404', '상대방의 로그인 ID를 찾을 수 없음');
+            }
         }
     });
-})
+});
 
 app.use('/', router) //라우터 객체를 app객체에 등록
 

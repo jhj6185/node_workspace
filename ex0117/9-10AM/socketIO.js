@@ -31,7 +31,7 @@ let MemberModel;
 //메인 파일에서 분리된 모듈 파일을 불러온 후 사용가능
 function createMemberSchema(database){
     console.log('createMemberSchema() 호출되었음');
-    database.MemberSchema = require('./ex0117/memberSchema.js').createSchema(mongoose);
+    database.MemberSchema = require('../memberSchema.js').createSchema(mongoose);
     database.MemberModel = mongoose.model("members2", database.MemberSchema);
     //memberSchema.js 에 MemberModel을 정의해놓은게있는데 그걸 주석하기 위해
     // 여기서 선언해준것

@@ -8,12 +8,23 @@ var app = express();
 app.set('/views',__dirname+'/views');
 app.set('view engine', 'ejs');
 
+var path=require('path');
+static = require('serve-static');
+app.use('/public', static(path.join(__dirname,'public')));
+app.use('/semantic', static(path.join(__dirname,'semantic')));
+
+var bodyParser = require('body-parser')
+//body-parser를 이용해 application/x-www-form-urlencoded 파싱
+app.use(bodyParser.urlencoded({extended: false}))
+//body-parser를 이용해 application/json 파싱
+app.use(bodyParser.json())
+
+//라우팅
 app.get('/search/news', (req, res) => { //람다식
     const client_id = 'f9I06yzTAQxLEyAYNCIr';
     const client_secret = 'kbNXwsmN_D';
-    const api_url = 'https://openapi.naver.com/v1/search/news?display=30&query=' + encodeURI('코인'); // json 결과
+    const api_url = 'https://openapi.naver.com/v1/search/news?display=30&query=' + encodeURI(req.query.query); // json 결과
     //   var api_url = 'https://openapi.naver.com/v1/search/blog.xml?query=' + encodeURI(req.query.query); // xml 결과
-    // const request = require('request');
     var request = require('request');
     const option = {};
     const options = {

@@ -191,13 +191,14 @@
 
     //로그인 버튼 클릭시 처리
     $("#loginButton").bind('click', function(event){
-        var userId = $('#userIdInput').val();
+        var userId = $('#userIdInput').val(); //값들 변수에 저장하고
         var userPwd = $('#userPwdInput').val();
         var alias = $('#aliasInput').val();
         var today = $('#todayInput').val();
         var time = Date();
         var output = {userId : userId, userPwd : userPwd, alias : alias, today : today,time:time};
-        console.log('서버로 보낼 데이터 : '+JSON.stringify(output));
+        console.log('서버로 보낼 데이터 : '+JSON.stringify(output)); 
+        //서버로 보낼 데이터를 json형식으로 변환
         if(socket == undefined){
             alert('서버에 연결 안됨, 먼저 서버에 연결부터');
             return;
